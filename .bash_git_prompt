@@ -1,0 +1,80 @@
+#    /\_/\  
+#   ( o.o )  
+#    > ^ <        
+# this is a simple git prompt.
+
+add_git_prompt() {
+
+  # Color definitions
+  local NC="\[\033[0m\]" # No Color
+  local GIT_BRANCH_COLOR="\[\033[33m\]" # yellow
+  local GIT_PATH_COLOR="\[\033[0;31m\]" # red~orange ?
+  local GIT_M_COLOR="\[\033[1;33m\]" # yellow
+  local GIT_D_COLOR="\[\033[1;31m\]" # red
+  local GIT_U_COLOR="\[\033[1;34m\]" # blue
+  local USER_COLOR="\[\033[01;32m\]" # green
+  local DIR_COLOR="\[\033[01;34m\]" # blue
+
+  # Function to get the count of edited, deleted, and untracked files
+  get_git_status_count() {
+    local status_type="$1"
+    git status -s --porcelain 2> /dev/null | grep "$status_type" | wc -l
+  }
+
+  # function to show edited files count
+  get_git_status_m() {
+    local count=$(get_git_status_count "^ M")
+    if [ "$count" -gt 0 ]; then
+        echo -n $GIT_M_COLOR'[~'$count']'$NC
+    fi
+  }
+
+  # function to show deleted files count
+  get_git_status_d() {
+    local count=$(get_git_status_count "^ D")
+    if [ "$count" -gt 0 ]; then
+        echo -n $GIT_D_COLOR'[-'$count']'$NC
+    fi
+  }
+
+  # function to show new files count
+  get_git_status_u() {
+    local count=$(get_git_status_count "^??")
+    if [ "$count" -gt 0 ]; then
+        echo -n $GIT_U_COLOR'[+'$count']'$NC
+    fi
+  }
+
+  # function to show branch name
+  get_git_branch_name() {
+    echo -n $GIT_BRANCH_COLOR'(* '$branch_name')'$NC
+  }
+
+  # function to change username buy another tag, maybe add git repo name next time
+  get_git_tag() {
+    echo -n $USER_COLOR'['$(git remote get-url origin | cut -d ':' -f 1)'] '$NC
+  }
+
+  # function to show relative path from git repo base
+  get_git_path() {
+    echo -n $GIT_PATH_COLOR'@'$(basename `git rev-parse --show-toplevel`)'/'$(git rev-parse --show-prefix)' '$NC
+  }
+
+  # ps1 base
+  PS1='${debian_chroot:+($debian_chroot)}'
+
+  # get branch name, assume all function are call after this line
+  local branch_name=$(git branch --show-current 2> /dev/null)
+  if [ -n "$branch_name" ]; then
+    # Override PS1 value
+    PS1+=$(get_git_tag)
+    PS1+=$(get_git_path)
+    PS1+=$(get_git_branch_name)
+    PS1+=$(get_git_status_u)$(get_git_status_m)$(get_git_status_d)
+    PS1+='$ '
+  else 
+    PS1+=$USER_COLOR'\u@\h'$NC':'$DIR_COLOR'\w'$NC'\$ '
+  fi
+}
+
+PROMPT_COMMAND=add_git_prompt
