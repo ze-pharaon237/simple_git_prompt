@@ -15,33 +15,39 @@ add_git_prompt() {
   local USER_COLOR="\[\033[01;32m\]" # green
   local DIR_COLOR="\[\033[01;34m\]" # blue
 
+  local status_count_modified=0
+  local status_count_untracked=0
+  local status_count_deleted=0
+
   # Function to get the count of edited, deleted, and untracked files
   get_git_status_count() {
-    local status_type="$1"
-    git status -s --porcelain 2> /dev/null | grep "$status_type" | wc -l
+    while IFS= read -r line; do
+      case "$line" in 
+        M*) ((status_count_modified++)) ;;
+        ??*) ((status_count_untracked++)) ;;
+        D*) ((status_count_deleted++)) ;;
+      esac
+    done < <(git status -s --porcelain 2> /dev/null)
   }
 
   # function to show edited files count
   get_git_status_m() {
-    local count=$(get_git_status_count "^ M")
-    if [ "$count" -gt 0 ]; then
-        echo -n $GIT_M_COLOR'[~'$count']'$NC
+    if [ "$status_count_modified" -gt 0 ]; then
+        echo -n $GIT_M_COLOR'[~'$status_count_modified']'$NC
     fi
   }
 
   # function to show deleted files count
   get_git_status_d() {
-    local count=$(get_git_status_count "^ D")
-    if [ "$count" -gt 0 ]; then
-        echo -n $GIT_D_COLOR'[-'$count']'$NC
+    if [ "$status_count_deleted" -gt 0 ]; then
+        echo -n $GIT_D_COLOR'[-'$status_count_deleted']'$NC
     fi
   }
 
   # function to show new files count
   get_git_status_u() {
-    local count=$(get_git_status_count "^??")
-    if [ "$count" -gt 0 ]; then
-        echo -n $GIT_U_COLOR'[+'$count']'$NC
+    if [ "$status_count_untracked" -gt 0 ]; then
+        echo -n $GIT_U_COLOR'[+'$status_count_untracked']'$NC
     fi
   }
 
