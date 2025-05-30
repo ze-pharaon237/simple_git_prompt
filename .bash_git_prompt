@@ -23,9 +23,9 @@ add_git_prompt() {
   get_git_status_count() {
     while IFS= read -r line; do
       case "$line" in 
-        M*) ((status_count_modified++)) ;;
-        ??*) ((status_count_untracked++)) ;;
-        D*) ((status_count_deleted++)) ;;
+        ' M'*) ((status_count_modified++)) ;;
+        '??'*) ((status_count_untracked++)) ;;
+        ' D'*) ((status_count_deleted++)) ;;
       esac
     done < <(git status -s --porcelain 2> /dev/null)
   }
@@ -56,14 +56,14 @@ add_git_prompt() {
     echo -n $GIT_BRANCH_COLOR'(* '$branch_name')'$NC
   }
 
-  # function to change username buy another tag, maybe add git repo name next time
+  # function to get repo tag
   get_git_tag() {
-    echo -n $USER_COLOR'['$(git remote get-url origin | cut -d ':' -f 1)'] '$NC
+    echo -n $USER_COLOR'['$(git remote -v |awk '{print $2}' | sed -E 's#(git@|https://|git://)([^:/]+).*#\2#' | uniq)']'$NC
   }
 
   # function to show relative path from git repo base
   get_git_path() {
-    echo -n $GIT_PATH_COLOR'@'$(basename `git rev-parse --show-toplevel`)'/'$(git rev-parse --show-prefix)' '$NC
+    echo -n $GIT_PATH_COLOR'@'$(basename `git rev-parse --show-toplevel`)'/'$(git rev-parse --show-prefix)$NC
   }
 
   # ps1 base
@@ -72,12 +72,14 @@ add_git_prompt() {
   # get branch name, assume all function are call after this line
   local branch_name=$(git branch --show-current 2> /dev/null)
   if [ -n "$branch_name" ]; then
+    # get status 
+    get_git_status_count
     # Override PS1 value
-    PS1+=$(get_git_tag)
-    PS1+=$(get_git_path)
-    PS1+=$(get_git_branch_name)
+    PS1+=$(get_git_tag)' '
+    PS1+=$(get_git_path)' '
+    PS1+=$(get_git_branch_name)' '
     PS1+=$(get_git_status_u)$(get_git_status_m)$(get_git_status_d)
-    PS1+='$ '
+    PS1+='\n$ '
   else 
     PS1+=$USER_COLOR'\u@\h'$NC':'$DIR_COLOR'\w'$NC'\$ '
   fi
