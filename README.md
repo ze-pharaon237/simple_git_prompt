@@ -8,8 +8,8 @@
 
 To install `git_prompt`, follow these simple steps:
 
-1. **Download the `bash_git_prompt` file**:
-   - Copy the `bash_git_prompt` file to your home directory (or to your preferred directory).
+1. **Download the `git_prompt.sh` file**:
+   - Copy the `git_prompt.sh` file to your home directory (or to your preferred directory).
 
 2. **Modify your `.bashrc` file**:
    - Open your `.bashrc` file in a text editor. You can use `nano`, `vim`, or any other editor of your choice. For example:
@@ -19,8 +19,8 @@ To install `git_prompt`, follow these simple steps:
 
 3. **Add the following code at the end of your `.bashrc` file**:
    ```bash
-   if [ -f ~/.bash_git_prompt ]; then
-       source ~/.bash_git_prompt
+   if [ -f ~/.git_prompt.sh ]; then
+       source ~/.git_prompt.sh
    fi
    ```
 
@@ -36,9 +36,9 @@ Once installed, your command prompt will automatically display information about
 
 ## Notes
 
-- Make sure the `bash_git_prompt` file is executable. You can make it executable with the following command:
+- Make sure the `git_prompt.sh` file is executable. You can make it executable with the following command:
   ```bash
-  chmod +x ~/.bash_git_prompt
+  chmod +x ~/.git_prompt.sh
   ```
 
 - If you encounter any issues or have questions, feel free to open an issue in this repository.
