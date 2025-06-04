@@ -58,7 +58,7 @@ add_git_prompt() {
 
   # function to get repo tag
   get_git_tag() {
-    echo -n $USER_COLOR'['$(git remote -v |awk '{print $2}' | sed -E 's#(git@|https://|git://)([^:/]+).*#\2#' | uniq)']'$NC
+    echo -n $USER_COLOR'['$(git remote -v | awk '{print $2}' | sed -E 's#(git@|https://|git://)([^@]+@)?([^:/]+).*#\3#' | uniq)']'$NC
   }
 
   # function to show relative path from git repo base
